@@ -91,6 +91,5 @@ class filament_odometry_sensor:
 
            if movement < 0 :
               self._logger.warn("Reverse filament movement detected.")
-              if self._printer.is_printing() :
-                 self._plugin.on_sensor_alarm("reverse movement detected")
+              self._plugin.on_sensor_alarm("reverse movement detected")
 

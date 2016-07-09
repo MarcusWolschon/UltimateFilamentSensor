@@ -17,7 +17,11 @@ import sys
 from . import filament_pulling_sensor
 from . import filament_odometry_sensor
 
-
+###########################################################
+# this is the actual OctoPrint plugin
+# it makes use of the 3 sensors, starts and stops them and
+# gets a callback if any of them reports an alarm
+###########################################################
 class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 			   octoprint.plugin.SettingsPlugin,
 			   octoprint.plugin.EventHandlerPlugin,
@@ -29,21 +33,37 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 		self._logger.info("Filament Sensor Plugin [%s] initialized..."%self._identifier)
 
 	def on_after_startup(self):
-		self.PINA_FILAMENT = self._settings.get(["pinA"])
-		self.PINB_FILAMENT = self._settings.get(["pinB"])
-		self.BOUNCE = self._settings.get_int(["bounce"])
-                # TODO: config params for pins
-                self.filament_force = filament_pulling_sensor.filament_pulling_sensor(self, 23, 24)
-                self.filament_odometry = filament_odometry_sensor.filament_odometry_sensor(self, self.PINA_FILAMENT, self.PINB_FILAMENT)
-		
+		settings = self._settings
+                self.filament_force    = filament_pulling_sensor.filament_pulling_sensor(  self,
+                                                                       settings.get(["force_pin_data"]),
+                                                                       settings.get(["force_pin_clk"]),
+                                                                       settings.get(["force_pin_scale"]),
+                                                                       settings.get(["force_pin_reference_unit"]),
+                                                                       settings.get(["force_pin_max_force"]),
+                                                                       settings.get(["force_pin_min_force"])
+                                                                      )
+                self.filament_odometry = filament_odometry_sensor.filament_odometry_sensor(self,
+                                                                       settings.get(["odometry_pina"]),
+                                                                       settings.get(["odometry_pinb"])
+                                                                      )
 		# DEBUGGING
                 self.start_sensors()
 
 	def get_settings_defaults(self):
 		return dict(
-			pinA = -1,
-			pinB = -1,
-			bounce = 1
+			odometry_pina = 16,
+			odometry_pinb = 20,
+			odometry_bounce = 1,
+			odometry_timeout = 5,
+			odometry_invere = False,
+                        force_pin_clk = 24,
+                        force_pin_data = 23,
+                        force_scale = 1000.0,
+                        force_reference_unit = 92,
+                        force_maxforce = 5.0,
+                        force_minforce = -0.5,
+                        weight_pin_clk = 25,
+                        weight_pin_data = 8
 		)
 
         def get_template_configs(self):
@@ -55,8 +75,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
 	def check_status(self):
 		status = "-1"
-		#TODO if self.PINA_FILAMENT != -1 and self.PINB_FILAMENT != -1 :
-	        #		status = "1" if GPIO.input(self.PINA_FILAMENT) or GPIO.input(self.PINB_FILAMENT) else "0"
+		#TODO get status from plugins
 		return jsonify( status = status )
 		
 	def on_event(self, event, payload):
@@ -64,26 +83,22 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 			self._logger.info("Printing started. Filament sensor enabled.")
 			self.init_gpio()
 		elif event in (Events.PRINT_DONE, Events.PRINT_FAILED, Events.PRINT_CANCELLED):
-			self._logger.info("Printing stopped. Filament sensor disbaled.")
+			self._logger.info("Printing stopped. Filament sensor disabaled.")
 			self.stop_sensors()
-			try:
-				GPIO.remove_event_detect(self.PINA_FILAMENT)
-				GPIO.remove_event_detect(self.PINB_FILAMENT)
-			except:
-				pass
 
 	def stop_sensors(self):
-		self._logger.debug("tearing down GPIO pins for rotary endoder")
+		self._logger.debug("stopping filament sensors")
                 self.filament_force.stop()
                 self.filament_odometry.stop()
 
 	def start_sensors(self):
-		self._logger.debug("initializing GPIO pins for rotary endoder")
+		self._logger.debug("starting filament sensors")
                 self.filament_force.start()
                 self.filament_odometry.start()
 
         # called by plugins to inform us that an alarm criteria is met
         def on_sensor_alarm(self, cause):
+                #TODO debugging if self._printer.is_printing() :
                 self._logger.error("[%s]. Pausing print." % cause)
                 self._printer.toggle_pause_print()
                 self.stop_sensors()
@@ -94,17 +109,17 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 	def get_update_information(self):
 		return dict(
 			ultimate_filament_sensor=dict(
-				displayName="Filament Sensor",
+				displayName="Ultimate Filament Sensor",
 				displayVersion=self._plugin_version,
 
 				# version check: github repository
 				type="github_release",
 				user="Marcus Wolschon",
-				repo="OctoPrint-Filament",
+				repo="UltimateFilamentSensor",
 				current=self._plugin_version,
 
 				# update method: pip
-				pip="https://github.com/TODO_MoonshineSG/OctoPrint-Filament/archive/{target_version}.zip"
+				pip="https://github.com/MarcusWolschon/UltimateFilamentSensor/archive/{target_version}.zip"
 			)
 		)
 
