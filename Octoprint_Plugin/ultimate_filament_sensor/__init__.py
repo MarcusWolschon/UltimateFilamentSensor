@@ -65,6 +65,11 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                         weight_pin_clk = 25,
                         weight_pin_data = 8
 		)
+#        def get_template_vars(self):
+#                # TODO more
+#                return dict(
+#                     odometry_pina=self._settings.get(["odometry_pina"])
+#               )
 
         def get_template_configs(self):
                 return [
@@ -127,7 +132,7 @@ __plugin_name__ = "Ultimate Filament Sensor"
 __plugin_version__ = "2.0.0"
 __plugin_description__ = "Use a filament sensor to pause printing when filament runs out."
 
-def __plugin_load__():
-	global __plugin_implementation__
-	__plugin_implementation__ = FilamentSensorPlugin()
+#def __plugin_load__():
+#	global __plugin_implementation__
+__plugin_implementation__ = FilamentSensorPlugin()
 
