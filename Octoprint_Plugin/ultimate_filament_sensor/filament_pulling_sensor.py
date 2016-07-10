@@ -49,5 +49,5 @@ class filament_pulling_sensor:
            #    self._plugin.on_sensor_alarm("excessive filament pulling force [%s > %s] detected" % (force, self.max))
            #TODO: always triggers if force < self.min :
            #    self._plugin.on_sensor_alarm("loss of filament pulling force [%s < %s] detected" % (force, self.min))
-        time.sleep(0.5)   
+        time.sleep(100)   
         self._logger.info("Filament Sensor Plugin - pulling force sensor - looper stopped")  
