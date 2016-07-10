@@ -1,9 +1,50 @@
 <form class="form-horizontal">
-TEST
     <div class="control-group">
-        <label class="control-label">{{ _('odometry_pina') }}</label>
+        <label class="control-label">rotary encoder: Pin A</label>
         <div class="controls">
             <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_pina">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">rotary encoder: Pin B</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_pinb">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">filament pulling force: Hx711 CLK pin (BCM)</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.force_pin_clk">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">filament pulling force: Hx711 DATA pin (BCM)</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.force_pin_data">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">minimum allowed filament pulling force during printing</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.force_minforce">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">maximum allowed filament pulling force during printing</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.force_maxforce">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">filament weight: Hx711 CLK pin (BCM)</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.weight_pin_clk">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">filament weight: Hx711 DATA pin (BCM)</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.weight_pin_data">
         </div>
     </div>
 </form>

@@ -31,7 +31,7 @@ http://marcuswolschon.blogspot.de/2016/06/ultimaker-ii-filament-sensor-and-remot
 ```
 alternative for development (no reinstall on every change of the source code):
 ```
- sudo /home/pi/oprint/local/bin/python setup.py devel && sudo /etc/init.d/octoprint restart && tail -f /home/pi/.octoprint/logs/octoprint.log
+ sudo /home/pi/oprint/local/bin/python setup.py develop && sudo /etc/init.d/octoprint restart && tail -f /home/pi/.octoprint/logs/octoprint.log
 ```
 
 Then add the following needs to be added to the config.yaml:
