@@ -9,6 +9,8 @@ Purpose:
 
 License: AGPL 3.0
 
+Status: WORK IN PROGRESS - unfinished
+
 # Attribution:
 
 This plugin is based on https://github.com/MoonshineSG/OctoPrint-Filament (AGPL 3.0 license)
