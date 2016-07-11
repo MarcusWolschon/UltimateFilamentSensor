@@ -27,11 +27,11 @@ http://marcuswolschon.blogspot.de/2016/06/ultimaker-ii-filament-sensor-and-remot
  /home/pi/oprint/bin/pip install --upgrade pip
  /home/pi/oprint/bin/pip install numpy
  sudo chmod a+rw /dev/gpiomem
- sudo /home/pi/oprint/local/bin/python setup.py install && sudo /etc/init.d/octoprint restart && tail -f /home/pi/.octoprint/logs/octoprint.log
+ /home/pi/oprint/local/bin/python setup.py install && sudo /etc/init.d/octoprint restart && tail -f /home/pi/.octoprint/logs/octoprint.log
 ```
 alternative for development (no reinstall on every change of the source code):
 ```
- sudo /home/pi/oprint/local/bin/python setup.py develop && sudo /etc/init.d/octoprint restart && tail -f /home/pi/.octoprint/logs/octoprint.log
+ /home/pi/oprint/local/bin/python setup.py develop && sudo /etc/init.d/octoprint restart && tail -f /home/pi/.octoprint/logs/octoprint.log
 ```
 
 Then add the following needs to be added to the config.yaml:
