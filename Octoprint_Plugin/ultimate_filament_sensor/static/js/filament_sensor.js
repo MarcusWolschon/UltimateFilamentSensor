@@ -28,7 +28,11 @@ $(function() {
                 success: self.initialMessage
             });
         }
-
+ 
+        // Called when a plugin message is pushed from the server with the identifier of the calling plugin
+        // as first and the actual message as the second parameter. Note that the latter might be a full
+        // fledged object, depending on the plugin sending the message. You can use this method to
+        // asynchronously push data from your plugin’s server component to it’s frontend component.
         self.onDataUpdaterPluginMessage = function(plugin, data) {
             if (plugin != "ultimate_filament_sensor") {
                 return;
@@ -44,7 +48,7 @@ $(function() {
 
     // This is how our plugin registers itself with the application, by adding some configuration
     // information to the global variable OCTOPRINT_VIEWMODELS
-    // We bind this ViewModel to the UI-element defined in templates/ultimate_filament_sensor_sidebar.jinja2
+    // We bind this ViewModel to the div-element defined in templates/ultimate_filament_sensor_sidebar.jinja2
     OCTOPRINT_VIEWMODELS.push([
         FilamentSensorViewModel,
         [ ],

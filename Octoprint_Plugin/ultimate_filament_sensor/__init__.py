@@ -27,6 +27,7 @@ from . import filament_odometry_sensor
 class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 			   octoprint.plugin.SettingsPlugin,
 			   octoprint.plugin.SimpleApiPlugin,
+                           octoprint.plugin.AssetPlugin,
 			   octoprint.plugin.EventHandlerPlugin,
 			   octoprint.plugin.TemplatePlugin):
 
@@ -79,11 +80,6 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                         dict(type="sidebar", name="Filament Sensor", icon="print")
                 ]
 
-	@octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
-	def check_status(self):
-		status = "-1"
-		#TODO get status from plugins
-		return jsonify( status = status )
 		
 	def on_event(self, event, payload):
 		if event == Events.PRINT_STARTED:
@@ -96,22 +92,28 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
         # TODO: enable the sensors only when there is any filament movement to be performed
         def on_gcode_sent(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
 	        #self._logger.info("gcode=%s sent cmd=%s args=%s" % (gcode, cmd, ', '.join(args) ) )
-                filament_movement_expected = 0
+                self.filament_movement_expected = 0
                 if gcode and gcode == "G1" and re.search("E[1-9]", cmd):
-                        self._logger.info("G1 Ex with x>0 found - filament movement expected")
-                        filament_movement_expected = 1
+                        #self._logger.info("G1 Ex with x>0 found - filament movement expected")
+                        self.filament_movement_expected = 1
 			#self._logger.info("Printing started and first G1 command happened. Filament sensor enabled.")
 			#self.start_sensors()
-                if gcode and gcode == "M104":
+                elif gcode and gcode == "M104":
 			if "S0" in cmd :
+                                 self.filament_movement_expected = 0
                                  self._logger.info("M104 S0 found - we are done printing")
 			         #self.stop_sensors()
                                  return
-                if filament_movement_expected == 1 :
+                else :
+                        self.filament_movement_expected = 0
+
+                if self.filament_movement_expected == 1 :
 			self._logger.info("filament movement expected")
 			#self._logger.info("Printing started and first G1 command happened. Filament sensor enabled.")
 			#self.start_sensors()
-	
+                else:	
+			self._logger.info("NO filament movement expected")
+
         def stop_sensors(self):
 		self._logger.debug("stopping filament sensors")
                 self.filament_force.stop()
@@ -124,12 +126,15 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                 self.filament_odometry.start()
 
         # called by plugins to inform us that an alarm criteria is met
+        # it is safe to call this method multiple times
         def on_sensor_alarm(self, cause):
                 self.ALARM = cause
-                if self._printer.is_printing() :
+                if self._printer.is_printing() and self.filament_movement_expected :
                    self._logger.error("[%s]. Pausing print." % cause)
                    self._printer.toggle_pause_print()
                    self.stop_sensors()
+                else :
+                   self._logger.info("[%s]. NOT Pausing print because we are not printing or not expecting a filament movement." % cause)
 
 	def get_version(self):
 		return self._plugin_version
