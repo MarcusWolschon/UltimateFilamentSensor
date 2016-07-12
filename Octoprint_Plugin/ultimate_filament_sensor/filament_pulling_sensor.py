@@ -46,9 +46,9 @@ class filament_pulling_sensor:
         while self.stop_looper == 0  :
            self.last_reading = self.sensor.get_weight(1) 
            self._logger.info("Filament Sensor Plugin - pulling force [%s]"%self.last_reading)  
-           #TODO: always triggers if self.last_reading >= self.max :
-           #    self._plugin.on_sensor_alarm("excessive filament pulling force [%s > %s] detected" % (self.last_reading, self.max))
-           #TODO: always triggers if self.last_reading < self.min :
-           #    self._plugin.on_sensor_alarm("loss of filament pulling force [%s < %s] detected" % (self.last_reading, self.min))
+           if self.last_reading >= self.max :
+               self._plugin.on_sensor_alarm("excessive filament pulling force [%s > %s] detected" % (self.last_reading, self.max))
+           if self.last_reading < self.min :
+               self._plugin.on_sensor_alarm("loss of filament pulling force [%s < %s] detected" % (self.last_reading, self.min))
            time.sleep(0.5)  # sleep 0.5 seconds  
         self._logger.info("Filament Sensor Plugin - pulling force sensor - looper stopped")  
