@@ -66,8 +66,8 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                         force_pin_data = 23,
                         force_scale = 1000.0,
                         force_reference_unit = 92,
-                        force_maxforce = 5.0,
-                        force_minforce = -5.0,
+                        force_maxforce = 50.0,
+                        force_minforce = -50.0,
                         weight_pin_clk = 25,
                         weight_pin_data = 8
 		)
@@ -134,8 +134,22 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                    self._logger.error("[%s]. Pausing print." % cause)
                    self._printer.toggle_pause_print()
                    self.stop_sensors()
+                   self.on_sensor_update()
                 else :
                    self._logger.info("[%s]. NOT Pausing print because we are not printing or not expecting a filament movement." % cause)
+
+        def on_sensor_update(self):
+	    settings = self._settings
+            self._plugin_manager.send_plugin_message(self._identifier, 
+                     dict(
+                        alarm=self.ALARM,
+                        weight="n/a",
+                        force=self.filament_force.last_reading,
+                        force_min=settings.get(["force_minforce"]),
+                        force_max=settings.get(["force_maxforce"]),
+                        odometry=max(self.filament_odometry.accumulated_movement,
+                             settings.get(["odometry_circumfence"]) * self.filament_odometry.accumulated_movement / 4)
+                ))
 
 	def get_version(self):
 		return self._plugin_version
