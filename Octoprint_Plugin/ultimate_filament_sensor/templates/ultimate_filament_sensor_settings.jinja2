@@ -1,71 +1,84 @@
-<form class="form-horizontal">
-<h1>rotary encoder</h1><br/>
+<form class="form-horizontal" id="settings_plugin_ultimate_filament_sensor">
+<h3>filament sensor setting</h3>
+<h4>rotary encoder</h4><br/>
     <div class="control-group">
         <label class="control-label">rotary encoder: Pin A</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_pina">
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">rotary encoder: Pin B</label>
-        <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_pinb">
+          <div class="input-append">
+            <input type="number" min="1" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_pina">
+            <span class="add-on">A</span>
+          </div>
+          <div class="input-append">
+            <input type="number" step="1" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_pinb">
+            <span class="add-on">B</span>
+          </div>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">minimum number of full rotations before we become active</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_min_rpm">
+            <input type="number" step="1" min="2" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_min_rpm">
+            <span class="add-on">rotations</span>
+            <span class="help-block"><small>Do not cause any pause until at least this much filament movement has happened.<br/>
+                                            Prevents accidental interruptions of the print during initial heating and priming.</small></span>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">number of seconds without filament movement to pause an automatic pause</label>
+        <label class="control-label">max time without movement</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_timeout">
+            <input type="number" step="any" min="0.1" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_timeout">
+            <span class="add-on">s</span>
+            <span class="help-block"><small>If we are printing and the minimum number of rotations has passed, pause the print if no filament is moving for this many seconds. </small></span>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">circumfence of the filament wheel in meters</label>
+        <label class="control-label">circumfence of the filament wheel</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_circumfence">
+            <input type="number" step="any" min="0.0" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_circumfence">
+            <span class="add-on">m</span>
+            <span class="help-block"><small>Used to calculate how much filament has actually moved.</small></span>
         </div>
     </div>
-<h1>filament pulling force</h1><br/>
+<h4>filament pulling force</h4><br/>
     <div class="control-group">
-        <label class="control-label">filament pulling force: Hx711 CLK pin (BCM)</label>
+        <label class="control-label">filament pulling force: Hx711 pins (BCM)</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.force_pin_clk">
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">filament pulling force: Hx711 DATA pin (BCM)</label>
-        <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.force_pin_data">
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">minimum allowed filament pulling force during printing</label>
-        <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.force_minforce">
+          <div class="input-append">
+            <input type="number" step="1" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.force_pin_clk">
+            <span class="add-on">CLK</span>
+          </div>
+          <div class="input-append">
+            <input type="number" step="1" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.force_pin_data">
+            <span class="add-on">DATA</span>
+          </div>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">maximum allowed filament pulling force during printing</label>
+        <label class="control-label"> allowed filament pulling force during printing</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.force_maxforce">
+          <div class="input-append">
+            <input type="number" step="any" min="0.001" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.force_minforce">
+            <span class="add-on">min</span>
+          </div>
+          <div class="input-append">
+            <input type="number" step="any" min="0.001" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.force_maxforce">
+            <span class="add-on">max</span>
+          </div>
+          <span class="help-block"><small>If the extruder has to pull harder then this (filament entangled) or we have a sudden loss of pulling force (empty spool or something snapped), pause the print. </small></span>
         </div>
     </div>
 <h1>spool weight</h1><br/>
     <div class="control-group">
-        <label class="control-label">filament weight: Hx711 CLK pin (BCM)</label>
+        <label class="control-label">filament weight: Hx711 pins (BCM)</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.weight_pin_clk">
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">filament weight: Hx711 DATA pin (BCM)</label>
-        <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.ultimate_filament_sensor.weight_pin_data">
+          <div class="input-append">
+            <input type="number" step="1" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.weight_pin_clk">
+            <span class="add-on">CLK</span>
+          </div>
+          <div class="input-append">
+            <input type="number" step="1" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.weight_pin_data">
+            <span class="add-on">DATA</span>
+          </div>
         </div>
     </div>
 </form>
