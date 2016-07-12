@@ -95,7 +95,7 @@ class filament_odometry_sensor:
            self.last_meassurement = time.clock()
            self.accumulated_movement += movement
 
-           if movement < 0 :
+           if movement < 0 and self.accumulated_movement > self.MINIMUM_MOVEMENT :
               self._logger.warn("Reverse filament movement detected.")
               self._plugin.on_sensor_alarm("reverse movement detected")
 

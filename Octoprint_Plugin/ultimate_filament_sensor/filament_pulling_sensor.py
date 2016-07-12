@@ -19,6 +19,7 @@ class filament_pulling_sensor:
         if reference_unit == None : reference_unit = 92
 
         self.max = max
+        self.last_reading = -1
         self.min = min
         self.sensor = hx711.HX711(pin_DATA, pin_SCK, gain)
         self.sensor.set_scale(scale)
@@ -43,11 +44,11 @@ class filament_pulling_sensor:
     def on_loop(self):
         self._logger.info("Filament Sensor Plugin - pulling force sensor - looper started")  
         while self.stop_looper == 0  :
-           force = self.sensor.get_weight(1) 
+           self.last_reading = self.sensor.get_weight(1) 
            self._logger.info("Filament Sensor Plugin - pulling force [%s]"%force)  
-           #TODO: always triggers if force >= self.max :
+           #TODO: always triggers if self.last_reading >= self.max :
            #    self._plugin.on_sensor_alarm("excessive filament pulling force [%s > %s] detected" % (force, self.max))
-           #TODO: always triggers if force < self.min :
+           #TODO: always triggers if self.last_reading < self.min :
            #    self._plugin.on_sensor_alarm("loss of filament pulling force [%s < %s] detected" % (force, self.min))
            time.sleep(0.5)  # sleep 0.5 seconds  
         self._logger.info("Filament Sensor Plugin - pulling force sensor - looper stopped")  

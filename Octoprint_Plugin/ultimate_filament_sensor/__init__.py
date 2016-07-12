@@ -13,6 +13,7 @@ import logging.handlers
 import RPi.GPIO as GPIO
 import time
 import sys
+import re
 
 from . import filament_pulling_sensor
 from . import filament_odometry_sensor
@@ -24,13 +25,14 @@ from . import filament_odometry_sensor
 ###########################################################
 class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 			   octoprint.plugin.SettingsPlugin,
+			   octoprint.plugin.SimpleApiPlugin,
 			   octoprint.plugin.EventHandlerPlugin,
-			   octoprint.plugin.TemplatePlugin,
-			   octoprint.plugin.BlueprintPlugin):
+			   octoprint.plugin.TemplatePlugin):
 
 	def initialize(self):
 		self._logger.setLevel(logging.DEBUG)
 		self._logger.info("Filament Sensor Plugin [%s] initialized..."%self._identifier)
+                self.ALARM = "none"
 
 	def on_after_startup(self):
 		settings = self._settings
@@ -67,10 +69,13 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                         weight_pin_data = 8
 		)
 
+        # TemplatePlugin
+
         def get_template_configs(self):
                 return [
                         dict(type="navbar", custom_bindings=False),
-                        dict(type="settings", custom_bindings=False)
+                        dict(type="settings", custom_bindings=False),
+                        dict(type="sidebar", name="Filament Sensor", icon="print")
                 ]
 
 	@octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
@@ -89,9 +94,9 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 
         # TODO: enable the sensors only when there is any filament movement to be performed
         def on_gcode_sent(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
-	        #self._logger.info("gcode sent cmd=%s args=%s" % (cmd, ', '.join(args) ) )
+	        self._logger.info("gcode=%s sent cmd=%s args=%s" % (gcode, cmd, ', '.join(args) ) )
                 filament_movement_expected = 0
-                if gcode and gcode == "G1" an re.search("E[1-9]", cmd):
+                if gcode and gcode == "G1" and re.search("E[1-9]", cmd):
                         self._logger.info("G1 Ex with x>0 found - filament movement expected")
                         filament_movement_expected = 1
 			#self._logger.info("Printing started and first G1 command happened. Filament sensor enabled.")
@@ -113,11 +118,13 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 
 	def start_sensors(self):
 		self._logger.debug("starting filament sensors")
+                self.ALARM = "none"
                 self.filament_force.start()
                 self.filament_odometry.start()
 
         # called by plugins to inform us that an alarm criteria is met
         def on_sensor_alarm(self, cause):
+                self.ALARM = cause
                 if self._printer.is_printing() :
                    self._logger.error("[%s]. Pausing print." % cause)
                    self._printer.toggle_pause_print()
@@ -142,6 +149,22 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 				pip="https://github.com/MarcusWolschon/UltimateFilamentSensor/archive/{target_version}.zip"
 			)
 		)
+        # AssetPlugin
+
+        def get_assets(self):
+            return {
+                "js": ["js/filament_sensor.js"]
+            }
+
+        # SimpleApiPlugin
+
+        def on_api_get(self, request):
+            return flask.jsonify(dict(
+                alarm=self.ALARM,
+                weight="n/a",
+                force=self.filament_force.last_reading,
+                odometry=(self.filament_odometry.self.accumulated_movement / 4)
+            ))
 
 __plugin_name__ = "Ultimate Filament Sensor"
 __plugin_version__ = "2.0.0"
@@ -152,5 +175,5 @@ def __plugin_load__():
    __plugin_implementation__ = FilamentSensorPlugin()
    global __plugin_hooks__
    __plugin_hooks__ = {
-# TODO we are slowing down the printer too much         "octoprint.comm.protocol.gcode.sent": __plugin_implementation__.on_gcode_sent
+         "octoprint.comm.protocol.gcode.sent": __plugin_implementation__.on_gcode_sent
     }
