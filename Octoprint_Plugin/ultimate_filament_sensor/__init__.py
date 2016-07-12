@@ -67,7 +67,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                         force_scale = 1000.0,
                         force_reference_unit = 92,
                         force_maxforce = 5.0,
-                        force_minforce = -0.5,
+                        force_minforce = -5.0,
                         weight_pin_clk = 25,
                         weight_pin_data = 8
 		)
