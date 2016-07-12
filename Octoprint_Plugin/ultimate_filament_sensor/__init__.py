@@ -34,7 +34,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 	def initialize(self):
 		self._logger.setLevel(logging.DEBUG)
 		self._logger.info("Filament Sensor Plugin [%s] initialized..."%self._identifier)
-                self.ALARM = "none"
+                self.ALARM = ""
 
 	def on_after_startup(self):
 		settings = self._settings
@@ -60,7 +60,8 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 			odometry_min_rpm = 10,
 			odometry_bounce = 1,
 			odometry_timeout = 5,
-			odometry_invere = False,
+			odometry_circumfence = 0.157,
+			odometry_invert = False,
                         force_pin_clk = 24,
                         force_pin_data = 23,
                         force_scale = 1000.0,
@@ -121,7 +122,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 
 	def start_sensors(self):
 		self._logger.debug("starting filament sensors")
-                self.ALARM = "none"
+                self.ALARM = ""
                 self.filament_force.start()
                 self.filament_odometry.start()
 
@@ -165,11 +166,15 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
         # SimpleApiPlugin
 
         def on_api_get(self, request):
+	    settings = self._settings
             return jsonify(dict(
                 alarm=self.ALARM,
                 weight="n/a",
                 force=self.filament_force.last_reading,
-                odometry=(self.filament_odometry.accumulated_movement / 4)
+                force_min=settings.get(["force_pin_min_force"]),
+                force_max=settings.get(["force_pin_max_force"]),
+                odometry=max(self.filament_odometry.accumulated_movement,
+                             settings.get(["odometry_circumfence"]) * self.filament_odometry.accumulated_movement / 4)
             ))
 
 __plugin_name__ = "Ultimate Filament Sensor"

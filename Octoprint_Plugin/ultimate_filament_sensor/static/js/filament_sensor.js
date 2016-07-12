@@ -5,6 +5,8 @@ $(function() {
         self.alarm    = ko.observable();
         self.weight   = ko.observable();
         self.force    = ko.observable();
+        self.force_min    = ko.observable();
+        self.force_max    = ko.observable();
         self.odometry = ko.observable();
         self.show_status = ko.observable(false);
 
@@ -12,6 +14,8 @@ $(function() {
             self.alarm(data.alarm);
             self.weight(data.weight);
             self.force(data.force);
+            self.force_min(data.force_min);
+            self.force_max(data.force_max);
             self.odometry(data.odometry);
             //self.show_status(data.odometry | data.weight | data.alarm | data.force ? true : false);
             self.show_status(true);
@@ -41,6 +45,8 @@ $(function() {
             self.alarm(data.alarm);
             self.weight(data.weight);
             self.force(data.force);
+            self.force_min(data.force_min);
+            self.force_max(data.force_max);
             self.odometry(data.odometry);
             self.show_status(true);
         };
