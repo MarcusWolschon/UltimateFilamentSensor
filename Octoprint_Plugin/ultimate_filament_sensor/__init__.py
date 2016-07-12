@@ -44,13 +44,16 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                                                                       )
                 self.filament_odometry = filament_odometry_sensor.filament_odometry_sensor(self,
                                                                        settings.get(["odometry_pina"]),
-                                                                       settings.get(["odometry_pinb"])
+                                                                       settings.get(["odometry_pinb"]),
+                                                                       settings.get(["odometry_min_rpm"]),
+                                                                       settings.get(["odometry_timeout"])
                                                                       )
 
 	def get_settings_defaults(self):
 		return dict(
 			odometry_pina = 16,
 			odometry_pinb = 20,
+			odometry_min_rpm = 10,
 			odometry_bounce = 1,
 			odometry_timeout = 5,
 			odometry_invere = False,

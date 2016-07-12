@@ -5,15 +5,15 @@ import logging.handlers
 import RPi.GPIO as GPIO
 
 class filament_odometry_sensor:
-    def __init__(self, plugin, pin_A, pin_B):
+    def __init__(self, plugin, pin_A, pin_B, min_rpm = 10, timeout = 5):
         self._logger = plugin._logger
         self._plugin = plugin
         self.looper = None
         self.PINA_FILAMENT = pin_A
         self.PINB_FILAMENT = pin_B
         self.BOUNCE = 1
-        self.TIMEOUT = 5
-        self.MINIMUM_MOVEMENT = 10 * 4  # minimum movement needed before we are active
+        self.TIMEOUT = timeout
+        self.MINIMUM_MOVEMENT = min_rpm * 4  # minimum movement needed before we are active
         self._logger.info("Running RPi.GPIO version '{0}'...".format(GPIO.VERSION))
         if GPIO.VERSION < "0.6":
            raise Exception("RPi.GPIO must be greater than 0.6")

@@ -42,6 +42,7 @@ plugins:
   ultimate_filament_sensor:
      odometry_pina : 16
      odometry_pinb : 20
+     odometry_min_rpm : 10
      odometry_bounce : 1
      odometry_timeout : 5
      odometry_invere : False
@@ -60,6 +61,8 @@ plugins:
 Pins are in BCM numbering.
 - odometry_pina - first pins for the rotary encoder, meassuring filament movement.
 - odometry_pinb - second pins for the rotary encoder, meassuring filament movement.
+- odometry_min_rpm - the filament wheel must have turned this many times before the odometry sensor will ever generate an alarm
+- odometry_timeout - if no movement is detected for this many seconds, pause the print
 - center pin of the rotary encoder is connected to GND, pina and pinb are pulled up by the Raspberry Pi
 - odometry_bound - time in milliseconds to debounce the odometry pins
 - odometry_inverse - inverse the detected direction of the rotary encoder. Reverse movement is a cause to pause the print. ("False" or "1")
