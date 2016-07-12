@@ -10,9 +10,10 @@ from flask import jsonify, request
 
 import logging
 import logging.handlers
-import RPi.GPIO as GPIO
 import time
 import sys
+
+# for regular expression matching on gcode
 import re
 
 from . import filament_pulling_sensor
@@ -94,7 +95,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 
         # TODO: enable the sensors only when there is any filament movement to be performed
         def on_gcode_sent(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
-	        self._logger.info("gcode=%s sent cmd=%s args=%s" % (gcode, cmd, ', '.join(args) ) )
+	        #self._logger.info("gcode=%s sent cmd=%s args=%s" % (gcode, cmd, ', '.join(args) ) )
                 filament_movement_expected = 0
                 if gcode and gcode == "G1" and re.search("E[1-9]", cmd):
                         self._logger.info("G1 Ex with x>0 found - filament movement expected")
@@ -159,11 +160,11 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
         # SimpleApiPlugin
 
         def on_api_get(self, request):
-            return flask.jsonify(dict(
+            return jsonify(dict(
                 alarm=self.ALARM,
                 weight="n/a",
                 force=self.filament_force.last_reading,
-                odometry=(self.filament_odometry.self.accumulated_movement / 4)
+                odometry=(self.filament_odometry.accumulated_movement / 4)
             ))
 
 __plugin_name__ = "Ultimate Filament Sensor"

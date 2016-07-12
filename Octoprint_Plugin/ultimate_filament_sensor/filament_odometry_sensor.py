@@ -21,6 +21,7 @@ class filament_odometry_sensor:
         #GPIO.setwarnings(False)
         self._logger.info("RPi.GPIO set up for BCM mode")
         self._logger.info("Filament Sensor Plugin setup to use GPIO BCM [%s] and BCM [%s] for rotary encoder..." % ( pin_A, pin_B ))
+        self.accumulated_movement = 0
 
     def start(self):
         self._logger.info("Filament Sensor Plugin - pulling odometry sensor - starting")  
