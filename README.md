@@ -46,6 +46,7 @@ plugins:
      odometry_bounce : 1
      odometry_timeout : 5
      odometry_invere : False
+     odometry_circumfence : 0.157
      force_pin_clk : 24
      force_pin_data : 23
      force_scale : 1000
@@ -63,6 +64,7 @@ Pins are in BCM numbering.
 - odometry_pinb - second pins for the rotary encoder, meassuring filament movement.
 - odometry_min_rpm - the filament wheel must have turned this many times before the odometry sensor will ever generate an alarm
 - odometry_timeout - if no movement is detected for this many seconds, pause the print
+- odometry_circumfence - circumfence of the filament wheel on the rotary encoder in meter
 - center pin of the rotary encoder is connected to GND, pina and pinb are pulled up by the Raspberry Pi
 - odometry_bound - time in milliseconds to debounce the odometry pins
 - odometry_inverse - inverse the detected direction of the rotary encoder. Reverse movement is a cause to pause the print. ("False" or "1")
