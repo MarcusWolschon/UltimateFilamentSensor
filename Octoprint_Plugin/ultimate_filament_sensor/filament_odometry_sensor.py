@@ -13,6 +13,7 @@ class filament_odometry_sensor:
         self.PINB_FILAMENT = pin_B
         self.BOUNCE = 1
         self.TIMEOUT = 5
+        self.MINIMUM_MOVEMENT = 10 * 4  # minimum movement needed before we are active
         self._logger.info("Running RPi.GPIO version '{0}'...".format(GPIO.VERSION))
         if GPIO.VERSION < "0.6":
            raise Exception("RPi.GPIO must be greater than 0.6")
@@ -26,6 +27,7 @@ class filament_odometry_sensor:
         GPIO.setup(self.PINA_FILAMENT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(self.PINB_FILAMENT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         self.last_position = 9
+        self.accumulated_movement = 0
         self.last_meassurement = time.clock()
         if self.PINA_FILAMENT != -1:
            GPIO.add_event_detect(self.PINA_FILAMENT, GPIO.BOTH, callback=self.on_gpio_event, bouncetime=self.BOUNCE)
@@ -37,6 +39,7 @@ class filament_odometry_sensor:
     def stop(self):
         self._logger.info("Filament Sensor Plugin - pulling odometry sensor - stopping")  
         self.stop_looper = 1
+        self.last_position = 9
         if self.looper is None and self.looper.isAlive() :
            self.looper.join()
         try:
@@ -47,17 +50,19 @@ class filament_odometry_sensor:
              GPIO.remove_event_detect(self.PINB_FILAMENT)
         except:
              pass
+        self.last_position = 9
+        self.accumulated_movement = 0
 
     def on_loop(self):
         self._logger.info("Filament Sensor Plugin - pulling odometry sensor - looper started")  
         while self.stop_looper == 0  :
            now = time.clock()
            difference = (self.TIMEOUT + self.last_meassurement) - now
-           if difference < 0 :
+           if difference < 0 and self.last_position != 9 and self.accumulated_movement > self.MINIMUM_MOVEMENT:
               self._logger.error("Filament Sensor Plugin - pulling odometry sensor - TIMEOUT DETECTED! NO FILAMENT MOVEMENT")  
               self._plugin.on_sensor_alarm("no filament movement detected within [%s]ms" % self.TIMEOUT)
               return
-           time.sleep(difference)   
+           time.sleep(max(1, difference)) # always sleep at least 1 second  
         self._logger.info("Filament Sensor Plugin - pulling odometry sensor - looper stopped")  
 
     # the value of one of the GPIO pins for the
@@ -88,6 +93,7 @@ class filament_odometry_sensor:
 
            self.last_position = position
            self.last_meassurement = time.clock()
+           self.accumulated_movement += movement
 
            if movement < 0 :
               self._logger.warn("Reverse filament movement detected.")
