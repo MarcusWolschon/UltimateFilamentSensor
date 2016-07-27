@@ -85,11 +85,11 @@
         <label class="control-label"> Scaling of raw values. First 'empty' is subtracted, then 'scale' multiplied to get 1.0=1Kg</label>
         <div class="controls">
           <div class="input-append">
-            <input type="number" step="any" min="0.001" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.weight_empty">
+            <input type="number" step="any" min="1" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.weight_empty">
             <span class="add-on">raw weight of empty spool</span>
           </div>
           <div class="input-append">
-            <input type="number" step="any" min="0.001" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.weight_scale">
+            <input type="number" step="any" min="0.000000000000001" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.weight_scale">
             <span class="add-on">scale factor for 1Kg after subtracting 'empty'</span>
           </div>
         </div>
