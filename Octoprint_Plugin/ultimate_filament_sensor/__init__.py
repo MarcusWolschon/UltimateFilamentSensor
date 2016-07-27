@@ -18,6 +18,7 @@ import re
 
 from . import filament_pulling_sensor
 from . import filament_odometry_sensor
+from . import filament_weight_sensor
 
 ###########################################################
 # this is the actual OctoPrint plugin
@@ -52,6 +53,13 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                                                                        settings.get(["odometry_min_rpm"]),
                                                                        settings.get(["odometry_timeout"])
                                                                       )
+                self.filament_weight    = filament_weight_sensor.filament_weight_sensor(  self,
+                                                                       settings.get(["weight_pin_data"]),
+                                                                       settings.get(["weight_pin_clk"]),
+                                                                       settings.get(["weight_pin_scale"]),
+                                                                       settings.get(["weight_pin_reference_unit"]),
+                                                                       settings.get(["weight_minweight"])
+                                                                      )
 
 	def get_settings_defaults(self):
 		return dict(
@@ -66,10 +74,13 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                         force_pin_data = 23,
                         force_scale = 1000.0,
                         force_reference_unit = 92,
-                        force_maxforce = 50.0,
-                        force_minforce = -50.0,
-                        weight_pin_clk = 25,
-                        weight_pin_data = 8
+                        force_maxforce = 150.0,
+                        force_minforce = -150.0,
+                        weight_pin_clk = 15,
+                        weight_pin_data = 14,
+                        weight_scale = 1000.0,
+                        weight_reference_unit = 92,
+                        weight_minweight = -150.0,
 		)
 
         # TemplatePlugin
@@ -118,12 +129,14 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
         def stop_sensors(self):
 		self._logger.debug("stopping filament sensors")
                 self.filament_force.stop()
+                self.filament_weight.stop()
                 self.filament_odometry.stop()
 
 	def start_sensors(self):
 		self._logger.debug("starting filament sensors")
                 self.ALARM = ""
                 self.filament_force.start()
+                self.filament_weight.start()
                 self.filament_odometry.start()
 
         # called by plugins to inform us that an alarm criteria is met
@@ -143,8 +156,8 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
             self._plugin_manager.send_plugin_message(self._identifier, 
                      dict(
                         alarm=self.ALARM,
-                        weight="n/a",
                         force=self.filament_force.last_reading,
+                        weight=self.filament_weight.last_reading,
                         force_min=settings.get(["force_minforce"]),
                         force_max=settings.get(["force_maxforce"]),
                         odometry=max(self.filament_odometry.accumulated_movement,
@@ -183,7 +196,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 	    settings = self._settings
             return jsonify(dict(
                 alarm=self.ALARM,
-                weight="n/a",
+                weight=self.filament_weight.last_reading,
                 force=self.filament_force.last_reading,
                 force_min=settings.get(["force_minforce"]),
                 force_max=settings.get(["force_maxforce"]),
