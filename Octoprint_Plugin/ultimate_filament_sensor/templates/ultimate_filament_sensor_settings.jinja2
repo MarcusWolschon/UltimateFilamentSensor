@@ -24,6 +24,15 @@
         </div>
     </div>
     <div class="control-group">
+        <label class="control-label">minimum number of reverse full rotations to pause print</label>
+        <div class="controls">
+            <input type="number" step="0.25" min="0" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_min_reverse">
+            <span class="add-on">rotations</span>
+            <span class="help-block"><small>Do not cause any pause until at least this much reverse filament movement has happened.<br/>
+                                            Prevents accidental interruptions of the print on vibration.</small></span>
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label">max time without movement</label>
         <div class="controls">
             <input type="number" step="any" min="0.1" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_timeout">

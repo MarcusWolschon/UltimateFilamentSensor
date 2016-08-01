@@ -43,6 +43,7 @@ plugins:
      odometry_pina : 16
      odometry_pinb : 20
      odometry_min_rpm : 10
+     odometry_min_reverse : 4
      odometry_bounce : 1
      odometry_timeout : 5
      odometry_invere : False

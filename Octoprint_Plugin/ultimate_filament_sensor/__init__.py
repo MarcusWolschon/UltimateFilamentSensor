@@ -51,7 +51,8 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                                                                        settings.get(["odometry_pina"]),
                                                                        settings.get(["odometry_pinb"]),
                                                                        settings.get(["odometry_min_rpm"]),
-                                                                       settings.get(["odometry_timeout"])
+                                                                       settings.get(["odometry_timeout"]),
+                                                                       settings.get(["odometry_min_reverse"])
                                                                       )
                 self.filament_weight    = filament_weight_sensor.filament_weight_sensor(  self,
                                                                        settings.get(["weight_pin_data"]),
@@ -69,6 +70,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
 			odometry_min_rpm = 10,
 			odometry_bounce = 1,
 			odometry_timeout = 5,
+			odometry_min_reverse=4,
 			odometry_circumfence = 0.157,
 			odometry_invert = False,
                         force_pin_clk = 24,
@@ -161,8 +163,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                         weight_min=settings.get(["weight_minweight"]),
                         force_min=settings.get(["force_minforce"]),
                         force_max=settings.get(["force_maxforce"]),
-                        odometry=max(self.filament_odometry.accumulated_movement,
-                             settings.get(["odometry_circumfence"]) * self.filament_odometry.accumulated_movement / 4)
+                        odometry= float(settings.get(["odometry_circumfence"])) * self.filament_odometry.accumulated_movement / 4.0
                 ))
 
 	def get_version(self):
@@ -198,12 +199,11 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
             return jsonify(dict(
                 alarm=self.ALARM,
                 weightraw=self.filament_weight.last_reading,
-                weight=(self.filament_weight.last_reading - settings.get(["weight_empty"])) * settings.get(["weight_scale"]),
+                weight=(self.filament_weight.last_reading - float(settings.get(["weight_empty"]))) * float(settings.get(["weight_scale"])),
                 force=self.filament_force.last_reading,
                 force_min=settings.get(["force_minforce"]),
                 force_max=settings.get(["force_maxforce"]),
-                odometry=max(self.filament_odometry.accumulated_movement,
-                             settings.get(["odometry_circumfence"]) * self.filament_odometry.accumulated_movement / 4)
+                odometry= float(settings.get(["odometry_circumfence"])) * self.filament_odometry.accumulated_movement / 4.0
             ))
 
 __plugin_name__ = "Ultimate Filament Sensor"

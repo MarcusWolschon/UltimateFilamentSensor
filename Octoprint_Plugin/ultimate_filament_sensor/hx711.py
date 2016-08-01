@@ -90,7 +90,7 @@ class HX711:
         values = 0
         for i in range(times):
             values += self.read()
-
+            time.sleep(0.1)  # sleep 0.1 seconds
         return values / times
 
     def get_value(self, times=3):

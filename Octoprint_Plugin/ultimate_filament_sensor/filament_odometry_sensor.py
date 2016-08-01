@@ -5,7 +5,7 @@ import logging.handlers
 import RPi.GPIO as GPIO
 
 class filament_odometry_sensor:
-    def __init__(self, plugin, pin_A, pin_B, min_rpm = 10, timeout = 5):
+    def __init__(self, plugin, pin_A, pin_B, min_rpm = 10, timeout = 5, min_reverse = 5):
         self._logger = plugin._logger
         self._plugin = plugin
         self.looper = None
@@ -13,6 +13,7 @@ class filament_odometry_sensor:
         self.PINB_FILAMENT = pin_B
         self.BOUNCE = 1
         self.TIMEOUT = timeout
+        self.MIN_REVERSE = min_reverse
         self.MINIMUM_MOVEMENT = min_rpm * 4  # minimum movement needed before we are active
         self._logger.info("Running RPi.GPIO version '{0}'...".format(GPIO.VERSION))
         if GPIO.VERSION < "0.6":
@@ -29,6 +30,7 @@ class filament_odometry_sensor:
         GPIO.setup(self.PINB_FILAMENT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         self.last_position = 9
         self.accumulated_movement = 0
+        self.accumulated_reverse_movement = 0
         self.last_meassurement = time.clock()
         if self.PINA_FILAMENT != -1:
            GPIO.add_event_detect(self.PINA_FILAMENT, GPIO.BOTH, callback=self.on_gpio_event, bouncetime=self.BOUNCE)
@@ -53,12 +55,13 @@ class filament_odometry_sensor:
              pass
         self.last_position = 9
         self.accumulated_movement = 0
+        self.accumulated_reverse_movement = 0
 
     def on_loop(self):
         self._logger.info("Filament Sensor Plugin - pulling odometry sensor - looper started")  
         while self.stop_looper == 0  :
            now = time.clock()
-           difference = (self.TIMEOUT + self.last_meassurement) - now
+           difference = (float(self.TIMEOUT) + self.last_meassurement) - now
            if difference < 0 and self.last_position != 9 and self.accumulated_movement > self.MINIMUM_MOVEMENT:
               self._logger.error("Filament Sensor Plugin - pulling odometry sensor - TIMEOUT DETECTED! NO FILAMENT MOVEMENT")  
               self._plugin.on_sensor_alarm("no filament movement detected within [%s]ms" % self.TIMEOUT)
@@ -96,8 +99,12 @@ class filament_odometry_sensor:
            self.last_meassurement = time.clock()
            self.accumulated_movement += movement
 
+           if movement > 0 :
+              self.accumulated_reverse_movement = 0
+
            if movement < 0 and self.accumulated_movement > self.MINIMUM_MOVEMENT :
-              self._logger.warn("Reverse filament movement detected.")
-              self._plugin.on_sensor_alarm("reverse movement detected")
-           self._plugin.on_sensor_update()
+              self.accumulated_reverse_movement += movement
+              if self.accumulated_reverse_movement > self.MIN_REVERSE :
+                 self._plugin.on_sensor_alarm("reverse movement detected")
+                 self._plugin.on_sensor_update()
 
