@@ -163,7 +163,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                         weight_min=settings.get(["weight_minweight"]),
                         force_min=settings.get(["force_minforce"]),
                         force_max=settings.get(["force_maxforce"]),
-                        odometry= float(settings.get(["odometry_circumfence"])) * self.filament_odometry.accumulated_movement / 4.0
+                        odometry= float(settings.get(["odometry_circumfence"])) * self.filament_odometry.accumulated_movement / 24.0
                 ))
 
 	def get_version(self):
@@ -203,7 +203,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                 force=self.filament_force.last_reading,
                 force_min=settings.get(["force_minforce"]),
                 force_max=settings.get(["force_maxforce"]),
-                odometry= float(settings.get(["odometry_circumfence"])) * self.filament_odometry.accumulated_movement / 4.0
+                odometry= float(settings.get(["odometry_circumfence"])) * self.filament_odometry.accumulated_movement / 24.0
             ))
 
 __plugin_name__ = "Ultimate Filament Sensor"
