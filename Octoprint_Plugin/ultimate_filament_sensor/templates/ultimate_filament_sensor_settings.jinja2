@@ -36,8 +36,8 @@
         <label class="control-label">max time without movement</label>
         <div class="controls">
             <input type="number" step="any" min="0.1" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.odometry_timeout">
-            <span class="add-on">s</span>
-            <span class="help-block"><small>If we are printing and the minimum number of rotations has passed, pause the print if no filament is moving for this many seconds. </small></span>
+            <span class="add-on">ms</span>
+            <span class="help-block"><small>If we are printing and the minimum number of rotations has passed, pause the print if no filament is moving for this many milliseconds. </small></span>
         </div>
     </div>
     <div class="control-group">
@@ -66,7 +66,7 @@
         <label class="control-label"> allowed filament pulling force during printing</label>
         <div class="controls">
           <div class="input-append">
-            <input type="number" step="any" min="0.001" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.force_minforce">
+            <input type="number" step="any" min="-150" class="input-mini text-right" data-bind="value: settings.plugins.ultimate_filament_sensor.force_minforce">
             <span class="add-on">min</span>
           </div>
           <div class="input-append">

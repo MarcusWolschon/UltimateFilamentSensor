@@ -54,7 +54,6 @@ class filament_odometry_sensor:
         except:
              pass
         self.last_position = 9
-        self.accumulated_movement = 0
         self.accumulated_reverse_movement = 0
 
     def on_loop(self):

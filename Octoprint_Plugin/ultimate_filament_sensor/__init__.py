@@ -108,18 +108,26 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
         def on_gcode_sent(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
 	        #self._logger.info("gcode=%s sent cmd=%s args=%s" % (gcode, cmd, ', '.join(args) ) )
                 self.filament_movement_expected = 0
-                if gcode and gcode == "G1" and re.search("E[1-9]", cmd):
-                        #self._logger.info("G1 Ex with x>0 found - filament movement expected")
-                        self.filament_movement_expected = 1
-			#self._logger.info("Printing started and first G1 command happened. Filament sensor enabled.")
-			#self.start_sensors()
+                if gcode and ( gcode == "G1" or gcode == "G0" ):
+                        if gcode and gcode == "G1" and re.search("E[1-9]", cmd):
+                             #self._logger.info("G1 Ex with x>0 found - filament movement expected")
+                             self.filament_movement_expected = 1
+			     #self._logger.info("Printing started and first G1 command happened. Filament sensor enabled.")
+			     #self.start_sensors()
+                        else:
+                             #self._logger.info("G1 Ex with x<=0 found - NO filament movement expected")
+                             self.filament_movement_expected = 0
                 elif gcode and gcode == "M104":
 			if "S0" in cmd :
                                  self.filament_movement_expected = 0
                                  self._logger.info("M104 S0 found - we are done printing")
 			         #self.stop_sensors()
                                  return
-                else :
+                elif gcode and (gcode == "M105" or gcode == "G90" ):
+                        #ignored
+                        return
+                else:
+	                self._logger.info("unknown gcode=%s sent cmd=%s args=%s - NOT EXPECTING FILAMENT MOVEMENT" % (gcode, cmd, ', '.join(args) ) )
                         self.filament_movement_expected = 0
 
                 if self.filament_movement_expected == 1 :
@@ -163,7 +171,7 @@ class FilamentSensorPlugin(octoprint.plugin.StartupPlugin,
                         weight_min=settings.get(["weight_minweight"]),
                         force_min=settings.get(["force_minforce"]),
                         force_max=settings.get(["force_maxforce"]),
-                        odometry= float(settings.get(["odometry_circumfence"])) * self.filament_odometry.accumulated_movement / 24.0
+                        odometry= "{:10.3f}".format( float(settings.get(["odometry_circumfence"])) * self.filament_odometry.accumulated_movement / (4.0*24.0) )
                 ))
 
 	def get_version(self):
